@@ -1,4 +1,6 @@
-import { Component } from 'react';
+// import { Component } from 'react';
+// import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { GlobalStyle } from 'GlobalStyle';
 import { Container, StartText } from './App.styled';
 import * as API from 'searchApi/SearchApi';
@@ -8,70 +10,72 @@ import { Loader } from 'components/Loader/Loader';
 import { Button } from 'components/Button/Button';
 
 const API_KEY = '34522335-c076a0351c3b24c3689abfb26';
-export class App extends Component {
-  state = {
-    galleryItem: [],
-    searchValue: '',
-    page: 1,
-    totalImgs: 0,
-    status: 'idle',
-  };
-  async componentDidUpdate(prevProps, prevState) {
-    const { searchValue, page } = this.state;
-    if (prevState.searchValue !== searchValue || prevState.page !== page) {
-      this.setState({ status: 'pending' });
+
+export function App() {
+  const [galleryItem, setGalleryItem] = useState([]);
+  const [searchValue, setSearchValue] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalImgs, setTotalImgs] = useState(0);
+  const [status, setStatus] = useState('idle');
+
+  useEffect(() => {
+    if (!searchValue) return;
+
+    const fetch = async () => {
+      setStatus('pending');
+
       try {
         const res = await API.searchImgs(searchValue, API_KEY, page);
         if (res.totalHits === 0) {
-          return this.setState({
-            status: 'rejected',
-          });
+          setStatus('rejected');
+          return;
         }
-        this.setState(e => ({
-          galleryItem: [...e.galleryItem, ...res.hits],
-          totalImgs: res.totalHits,
-          status: 'resolved',
-        }));
+        setGalleryItem(s => [...s, ...res.hits]);
+        setTotalImgs(res.totalHits);
+        setStatus('resolved');
       } catch (error) {
-        this.setState({
-          status: 'rejected',
-        });
+        setStatus('rejected');
+        console.log(error);
       }
-    }
-  }
-  onSubmit = values => {
-    if (values.search === this.state.searchValue) {
+    };
+
+    fetch();
+  }, [searchValue, page]);
+
+  const onSubmit = value => {
+    if (value === '') {
       return;
     }
-    this.setState({ searchValue: values.search, galleryItem: [], page: 1 });
+    if (value === searchValue) {
+      return;
+    }
+    setTotalImgs(0);
+    setGalleryItem([]);
+    setSearchValue(value);
+    setPage(1);
   };
-  onLoadMore = () => {
-    this.setState(e => ({ page: e.page + 1 }));
+
+  const onLoadMore = () => {
+    setStatus('pending');
+    setPage(prevPage => prevPage + 1);
   };
-  render() {
-    const { galleryItem, searchValue, totalImgs, status } = this.state;
-    return (
-      <Container>
-        <GlobalStyle></GlobalStyle>
-        <Searchbar onSubmit={this.onSubmit} />
-        {status === 'idle' && <StartText>Please enter your request</StartText>}
-        {status === 'rejected' && (
-          <StartText>
-            Sorry, no result at your request "{searchValue}"
-          </StartText>
-        )}
-        <ImageGallery
-          items={galleryItem}
-          status={status}
-          searchValue={searchValue}
-        />
-        {status === 'pending' && <Loader></Loader>}
-        {galleryItem.length !== 0 &&
-          totalImgs > 12 &&
-          galleryItem.length % 2 === 0 && (
-            <Button onClick={this.onLoadMore}></Button>
-          )}
-      </Container>
-    );
-  }
+  return (
+    <Container>
+      <GlobalStyle></GlobalStyle>
+      <Searchbar onSubmit={onSubmit} />
+      {status === 'idle' && <StartText>Please enter your request</StartText>}
+      {status === 'rejected' && (
+        <StartText>Sorry, no result at your request "{searchValue}"</StartText>
+      )}
+      <ImageGallery
+        items={galleryItem}
+        status={status}
+        searchValue={searchValue}
+      />
+      {status === 'pending' && <Loader></Loader>}
+      {galleryItem.length !== 0 &&
+        totalImgs > 12 &&
+        galleryItem.length % 2 === 0 && <Button onClick={onLoadMore}></Button>}
+    </Container>
+  );
 }

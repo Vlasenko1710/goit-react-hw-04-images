@@ -1,41 +1,31 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Component } from 'react';
 import { ModalImg } from 'components/ModalImg/ModalImg';
 import { Item, Image } from './ImageGalleryItem.styled';
-export class ImageGalleryItem extends Component {
- state = {
-    selectedImg: null,
-  };
 
-  setSelectedImg = () => {
-    this.setState({ selectedImg: this.props.item.largeImageURL });
-  };
+export const ImageGalleryItem = ({
+  item: { webformatURL, tags, largeImageURL },
+}) => {
+  const [selectedImg, setSelectedImg] = useState(null);
 
-  closeModal = () => {
-    this.setState({ selectedImg: null });
-  };
-  render() {
-    const { selectedImg } = this.state;
-    const { item } = this.props;
-    return (
-      <div>
+  return (
+    <div>
       <Item>
         <Image
-          src={item.webformatURL}
-          alt={item.tags}
-          onClick={this.setSelectedImg}
-        /></Item>
-        <ModalImg
-          isOpen={selectedImg !== null}
-          onClose={this.closeModal}
-          image={selectedImg}
-          alt={item.tags}
+          src={webformatURL}
+          alt={tags}
+          onClick={() => setSelectedImg(largeImageURL)}
         />
-      </div>
-    );
-  }
-}
-
+      </Item>
+      <ModalImg
+        isOpen={selectedImg !== null}
+        onClose={() => setSelectedImg(null)}
+        image={selectedImg}
+        alt={tags}
+      />
+    </div>
+  );
+};
 ImageGalleryItem.propTypes = {
   item: PropTypes.shape({
     webformatURL: PropTypes.string.isRequired,

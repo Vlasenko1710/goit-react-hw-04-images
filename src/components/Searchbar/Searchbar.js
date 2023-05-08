@@ -8,29 +8,28 @@ import {
   SearchFormButtonLabel,
 } from './Searchbar.styled';
 export const Searchbar = ({ onSubmit }) => {
-  const handleSubmit = async (values, { setSubmitting }) => {
-    await onSubmit(values);
-    setSubmitting(false);
+  const handleSubmit = e => {
+    onSubmit(e.searchValue);
   };
 
   return (
     <Header>
-      <Formik initialValues={{ search: '' }} onSubmit={handleSubmit}>
-        {({ isSubmitting }) => (
-          <Form autoComplete="off">
-            <SerchButton type="submit" disabled={isSubmitting}>
-              <SearchFormButtonLabel>
-                <AiOutlineSearch />
-              </SearchFormButtonLabel>
-            </SerchButton>
-            <Field
-              className="SearchForm-input"
-              name="search"
-              type="text"
-              placeholder="Search images and photos"
-            />
-          </Form>
-        )}
+      <Formik initialValues={{ searchValue: '' }} onSubmit={handleSubmit}>
+        {/* {({ isSubmitting }) => ( */}
+        <Form autoComplete="off">
+          <SerchButton type="submit">
+            <SearchFormButtonLabel>
+              <AiOutlineSearch />
+            </SearchFormButtonLabel>
+          </SerchButton>
+          <Field
+            className="SearchForm-input"
+            name="searchValue"
+            type="text"
+            placeholder="Search images and photos"
+          />
+        </Form>
+        {/* )} */}
       </Formik>
     </Header>
   );

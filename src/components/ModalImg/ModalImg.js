@@ -3,7 +3,7 @@ import Modal from 'react-modal';
 // import { ImageModal } from './ModalImg.styled';
 
 const customStyles = {
- overlay: {
+  overlay: {
     position: 'fixed',
     top: 0,
     left: 0,
@@ -31,11 +31,9 @@ const customStyles = {
     justifyContent: 'center',
     alignItems: 'center',
   },
-
 };
 
 Modal.setAppElement('#root');
-
 
 export const ModalImg = ({ isOpen, image, alt, onClose }) => {
   return (
@@ -46,7 +44,7 @@ export const ModalImg = ({ isOpen, image, alt, onClose }) => {
       contentLabel="Image modal"
     >
       <div>
-        <img src={image} alt={alt}/>
+        <img src={image} alt={alt} />
       </div>
     </Modal>
   );
@@ -56,5 +54,5 @@ ModalImg.propTypes = {
   image: PropTypes.string.isRequired,
   alt: PropTypes.string.isRequired,
   isOpen: PropTypes.func.isRequired,
-  onClose:PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
